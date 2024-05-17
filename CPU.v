@@ -1,10 +1,11 @@
 `timescale 1ns / 1ps
 
 module CPU(
-    clk, rst, ConfirmCtrl, test_index, led_data,start_pg, rx, tx
+    clk, rst, ConfirmCtrl, test_index, led_data,start_pg, rx, tx,io_rdata
     );
     input clk, rst;
     input ConfirmCtrl;
+    input [7:0] io_rdata;
     input [2:0] test_index;
     output [15:0] led_data;
     input start_pg;
@@ -26,7 +27,7 @@ module CPU(
     wire [1:0] ALUOp;
     wire [31:0] write_data, addr_out, m_rdata;
     
-    wire [7:0] io_rdata;
+    
     wire I_format, Sftmd, RegDST, MemorIOtoReg, SwitchCtrl; // ????
     
     wire cpu_clk,upg_clk;
@@ -82,7 +83,7 @@ module CPU(
 );
     
     control32 ctrl (.Instruction(instruction), .Jr(jr), .Branch(b_beq), .Jal(jal),
-                    .Alu_resultHigh(ALU_result[31:10]), 
+                    . rega7(rega7),
                     .RegDST(RegDST), .MemorIOtoReg(MemorIOtoReg), .RegWrite(RegWrite), 
                     .MemRead(MemRead), .MemWrite(MemWrite),
                     .IORead(IORead), .IOWrite(IOWrite),
@@ -91,7 +92,7 @@ module CPU(
     MemOrIO MemOrIO (.mRead(MemRead), .mWrite(MemWrite), .ioRead(IORead), .ioWrite(IOWrite),
                      .addr_in(ALU_result), .addr_out(addr_out), .m_rdata(m_rdata), .io_rdata(io_rdata), 
                      .r_wdata(r_wdata), .r_rdata(read_data2), .write_data(write_data), 
-                     .LEDCtrl(LEDCtrl), .SwitchCtrl(SwitchCtrl), .ConfirmCtrl(ConfirmCtrl), .test_index(test_index));
+                     .LEDCtrl(LEDCtrl),  .ConfirmCtrl(ConfirmCtrl), .test_index(test_index), .rega7(rega7),.shuma(shuma),.signextend(signextend));
     
 
 
