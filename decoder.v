@@ -21,13 +21,13 @@
 
 
 module decoder(
-instruction,immNum,numRe1,numRe2,clk,r_wdata,ALUResult,MemtoReg,regWrite,reset,a7
+instruction,immNum,numRe1,numRe2,clk,r_wdata,ALUResult,MemtoReg,regWrite,reset,a7,signextend
     );
     reg[31:0] register[0:31];
     input regWrite,reset;
     wire [31:0]data;
     input[31:0]instruction;
-    input clk,MemtoReg;
+    input clk,MemtoReg,signextend;
     input[31:0] r_wdata,ALUResult;
     output [31:0]immNum,numRe1;
     output [31:0]  numRe2,a7;
@@ -40,7 +40,7 @@ instruction,immNum,numRe1,numRe2,clk,r_wdata,ALUResult,MemtoReg,regWrite,reset,a
       end
     end
     
-    imm32 imm(.in(instruction),.imm(immNum));
+    imm32 imm(.in(instruction),.imm(immNum),.signextend(signextend));
     assign a7=register[17];
     assign data=(MemtoReg == 1'b1)? r_wdata : ALUResult;
     assign numRe1=register[instruction[19:15]];
