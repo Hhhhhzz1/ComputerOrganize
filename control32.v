@@ -54,7 +54,7 @@ IORead, IOWrite,
     assign I_format=(opcode==7'b0010011||opcode==7'b0000011)?1:0;
     assign Sftmd=(((opcode==7'b0010011)||(opcode==7'b0110011))&&((Instruction[14:12]==3'h3)||(Instruction[14:12]==3'h2)||(Instruction[14:12]==3'h5)||(Instruction[14:12]==3'h1)))?1:0;
     assign Branch=(opcode==7'b1100011)?1:0;// beq bnq blt bge
-    assign ALUOp={(opcode==7'b0110011),Branch};
+    assign ALUOp={(opcode==7'b0110011),Branch};  //to add jal and jr
     assign RegDST=(opcode==7'b0110011||I_format);//R type I type
     assign ALUSrc=(opcode==7'b0110011)?0:1; // R=0 ELSE =1
     
@@ -62,7 +62,7 @@ IORead, IOWrite,
     wire sw=(opcode==7'b0100011)?1:0;
     
     
-    assign RegWrite = (opcode==7'b0110011||I_format);//R type I type      
+    assign RegWrite = (opcode==7'b0110011||I_format||MemorIOtoReg);//R type I type      
     assign IORead  = (rega7>=32'h00000000&&rega7<=32'h00000003) ? 1'b1:1'b0; 
     assign IOWrite=(rega7>=32'h00000004&&rega7<=32'h00000005) ? 1'b1:1'b0; 
     assign MemWrite = ((sw==1)) ? 1'b1:1'b0;  
