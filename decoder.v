@@ -44,7 +44,8 @@ instruction,immNum,numRe1,numRe2,clk,r_wdata,ALUResult,MemtoReg,regWrite,reset,a
     assign a7=register[17];
     assign data=(MemtoReg == 1'b1)? r_wdata : ALUResult;
     assign numRe1=register[instruction[19:15]];
-    assign numRe2=(instruction == 32'h00000073&&register[17]==2)?register[10]:register[instruction[24:20]];
+    assign numRe2=(instruction == 32'h00000073&&(register[17]==4||register[17]==5))
+    ?register[10]:register[instruction[24:20]];
 
     integer j;
     always@(posedge clk or posedge reset)begin
