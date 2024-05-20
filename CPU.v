@@ -1,13 +1,14 @@
 `timescale 1ns / 1ps
 
 module CPU(
-    clk, rst, ConfirmCtrl, test_index, led_data,start_pg, rx, tx,io_rdata
+    clk, rst, ConfirmCtrl, test_index, led_data,start_pg, rx, tx,an,light_data
     );
     input clk, rst;
     input ConfirmCtrl;
-    input [7:0] io_rdata;
     input [2:0] test_index;
     output [15:0] led_data;
+    output [7:0]an;
+    output [6:0]light_data;
     input start_pg;
     input rx;
     output tx;    
@@ -17,7 +18,7 @@ module CPU(
     wire [31:0] PC;
     wire [31:0] instruction;
     wire [31:0] link_addr;
-    wire jmp, jal, jr, b_beq, b_bne; 
+    wire jal, jr, b_beq, b_bne; 
     wire [31:0] immNum;
     
     wire [31:0] ALU_result;
@@ -27,7 +28,7 @@ module CPU(
     wire [1:0] ALUOp;
     wire [31:0] write_data, addr_out, m_rdata;
     
-    
+    wire [7:0] io_rdata;
     wire I_format, Sftmd, RegDST, MemorIOtoReg, SwitchCtrl; // ????
     
     wire cpu_clk,upg_clk;
@@ -64,14 +65,14 @@ module CPU(
         
     
     IFetch ifetch (.clk(cpu_clk), .rst(rst_2), .instruction(instruction),
-                   .dest_addr(dest_addr), .jalr_addr(jalr_addr), .read_data(read_data1),
-                   .branch_beq(b_beq),
-                   .branch_bne(b_bne), .equal(zero), .jmp(jmp) ,.jal(jal) ,.jr(jr),
+                   .imm(immNum),  
+                   .beq(b_beq),
+                   .bne(b_bne), .equal(zero) ,.jal(jal) ,.jr(jr),
                    .adjacent_PC(link_addr), .PC(PC));
-    
+wire [31:0]a7;wire signextend;    
     decoder decoder (.instruction(instruction), .immNum(immNum), .reset(rst_2),.r_wdata(r_wdata),
                      .numRe1(read_data1), .numRe2(read_data2), .clk(cpu_clk),.ALUResult(ALU_result)
-                     ,.regWrite(RegWrite),.MemtoReg(MemorIOtoReg));
+                     ,.regWrite(RegWrite),.MemtoReg(MemorIOtoReg),.signextend(signextend),.a7(a7));
                      
     ALU alu (.ReadData1(read_data1), .ReadData2(read_data2),.imm32(immNum),
              .zero(zero), .ALUResult(ALU_result), .ALUOp(ALUOp), .ALUSrc(ALUSrc),
@@ -83,7 +84,7 @@ module CPU(
 );
     
     control32 ctrl (.Instruction(instruction), .Jr(jr), .Branch(b_beq), .Jal(jal),
-                    . rega7(rega7),
+                     
                     .RegDST(RegDST), .MemorIOtoReg(MemorIOtoReg), .RegWrite(RegWrite), 
                     .MemRead(MemRead), .MemWrite(MemWrite),
                     .IORead(IORead), .IOWrite(IOWrite),
@@ -91,10 +92,10 @@ module CPU(
    
     MemOrIO MemOrIO (.mRead(MemRead), .mWrite(MemWrite), .ioRead(IORead), .ioWrite(IOWrite),
                      .addr_in(ALU_result), .addr_out(addr_out), .m_rdata(m_rdata), .io_rdata(io_rdata), 
-                     .r_wdata(r_wdata), .r_rdata(read_data2), .write_data(write_data), 
-                     .LEDCtrl(LEDCtrl),  .ConfirmCtrl(ConfirmCtrl), .test_index(test_index), .rega7(rega7),.shuma(shuma),.signextend(signextend));
+                     .r_wdata(r_wdata), .r_rdata(read_data2), .write_data(write_data), .rega7(a7),.signextend(signextend),
+                     .LEDCtrl(LEDCtrl),  .ConfirmCtrl(ConfirmCtrl), .test_index(test_index));
     
-
+    light lights(.clk(cpu_clk),.LEDCtrl(LEDCtrl),.write_data(write_data),.light_data(light_data),.an(an),.rst(rst));
 
     
 endmodule
