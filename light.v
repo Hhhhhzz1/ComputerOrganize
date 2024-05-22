@@ -29,26 +29,30 @@ rst,LEDCtrl,write_data,light_data,an,clk
     output reg[7:0]an;
     output reg[6:0] light_data;
     
-    reg[18:0] clkdiv=0;
+    
+    reg[16:0] clkdiv=0;
     reg[3:0] display;// diaplay state
     always @(posedge clk ) begin
-            
         clkdiv<=clkdiv+1;
     end
     
     wire [2:0] sign;
-    assign sign=clkdiv[18:16];
+    assign sign=clkdiv[16:14];
     always @(*) begin
-        case (sign)
-          3'b000: an=8'b10000000;
-          3'b001: an=8'b01000000;
-          3'b010: an=8'b00100000;
-          3'b011: an=8'b00010000;
-          3'b100: an=8'b00001000;
-          3'b101: an=8'b00000100;
-          3'b110: an=8'b00000010;  
-          3'b111: an=8'b00000001;      
-        endcase
+    if(rst==1'b0)
+      an=8'b00000001;
+    else begin
+            case (sign)
+      3'b000: an=8'b10000000;
+      3'b001: an=8'b01000000;
+      3'b010: an=8'b00100000;
+      3'b011: an=8'b00010000;
+      3'b100: an=8'b00001000;
+      3'b101: an=8'b00000100;
+      3'b110: an=8'b00000010;  
+      3'b111: an=8'b00000001;      
+    endcase
+    end
     end
     
     always @(*)begin
@@ -65,14 +69,17 @@ rst,LEDCtrl,write_data,light_data,an,clk
     end    
      always @(*) begin
            case (display)
-           4'h0:light_data=7'b1111110;//0  
-           4'h1:light_data=7'b0110000;//1
-           4'h1:light_data=7'b1101101;//2
-           4'h2:light_data=7'b1111001;//3
-           4'h3:light_data=7'b0110011;//4
-           4'h4:light_data=7'b1011011;//5
-           4'h5:light_data=7'b1011111;//6
-           4'h6:light_data=7'b1110000;//7
+           4'd0:light_data=7'b1111110;//0  
+           4'd1:light_data=7'b0110000;//1
+           4'd2:light_data=7'b1101101;//2
+           4'd3:light_data=7'b1111001;//3
+           4'd4:light_data=7'b0110011;//4
+           4'd5:light_data=7'b1011011;//5
+           4'd6:light_data=7'b1011111;//6
+           4'd7:light_data=7'b1110000;//7
+           4'd8:light_data=7'b1111111;//8
+           4'd9:light_data=7'b1110011;//9
+           
            4'd10:light_data=7'b1110111;//A
            4'd11:light_data=7'b0011111;//b
            4'd12:light_data=7'b1001110;//c
@@ -81,7 +88,7 @@ rst,LEDCtrl,write_data,light_data,an,clk
            4'd15:light_data=7'b1000111;//F
            
            
-           default:light_data=7'b0000000;//nothing
+           default:light_data=7'b0000001;//nothing to test
            endcase
            
        end
