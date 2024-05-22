@@ -2,6 +2,7 @@
 
 module CPU(
     clk, rst, ConfirmCtrl, test_index, led_data,start_pg, rx, tx,an,light_data
+//    ,light_data2
     );
     input clk, rst;
     input ConfirmCtrl;
@@ -9,6 +10,7 @@ module CPU(
     output [15:0] led_data;
     output [7:0]an;
     output [6:0]light_data;
+//    output [6:0]light_data2;
     input start_pg;
     input rx;
     output tx;    
@@ -66,8 +68,7 @@ module CPU(
     
     IFetch ifetch (.clk(cpu_clk), .rst(rst_2), .instruction(instruction),
                    .imm(immNum),  
-                   .beq(b_beq),
-                   .bne(b_bne), .equal(zero) ,.jal(jal) ,.jr(jr),
+                   .beq(b_beq), .equal(zero) ,.jal(jal) ,.jr(jr),
                    .adjacent_PC(link_addr), .PC(PC));
 wire [31:0]a7;wire signextend;    
     decoder decoder (.instruction(instruction), .immNum(immNum), .reset(rst_2),.r_wdata(r_wdata),
@@ -86,7 +87,7 @@ wire [31:0]a7;wire signextend;
     control32 ctrl (.Instruction(instruction), .Jr(jr), .Branch(b_beq), .Jal(jal),
                      
                     .RegDST(RegDST), .MemorIOtoReg(MemorIOtoReg), .RegWrite(RegWrite), 
-                    .MemRead(MemRead), .MemWrite(MemWrite),
+                    .MemRead(MemRead), .MemWrite(MemWrite),.rega7(a7),
                     .IORead(IORead), .IOWrite(IOWrite),
                     .ALUSrc(ALUSrc), .ALUOp(ALUOp), .Sftmd(Sftmd), .I_format(I_format));
    
@@ -94,8 +95,9 @@ wire [31:0]a7;wire signextend;
                      .addr_in(ALU_result), .addr_out(addr_out), .m_rdata(m_rdata), .io_rdata(io_rdata), 
                      .r_wdata(r_wdata), .r_rdata(read_data2), .write_data(write_data), .rega7(a7),.signextend(signextend),
                      .LEDCtrl(LEDCtrl),  .ConfirmCtrl(ConfirmCtrl), .test_index(test_index));
-    
-    light lights(.clk(cpu_clk),.LEDCtrl(LEDCtrl),.write_data(write_data),.light_data(light_data),.an(an),.rst(rst));
+    wire [7:0]an2;
+    light lights(.clk(cpu_clk),.LEDCtrl(LEDCtrl),.write_data(write_data),.light_data(light_data),.an(an),.rst(rst_2));
+//    light lights2(.clk(clk),.LEDCtrl(LEDCtrl),.write_data(write_data),.light_data(light_data2),.an(an2),.rst(rst_2));
 
     
 endmodule
