@@ -1,18 +1,17 @@
 `timescale 1ns / 1ps
 
-module Ifetch(  
+module IFetch(  
   
     input     clk,
     input     rst,
     
     input[31:0] instruction,
-    input[31:0] dest_addr,  //  destination address from ALU
-    input[31:0] jalr_addr,  //  address from `jalr` instruction
+    input[31:0] imm,  //  destination address from ALU
+//    input[31:0] jalr_addr,  //  address from `jalr` instruction
     
     input     beq,
     input     bne,
     input     equal,
-    input     jmp,
     input     jal,
     input     jr,
 
@@ -25,27 +24,31 @@ module Ifetch(
     wire [31:0] curr_PC;
     reg [31:0] dest_PC;
     assign curr_PC = PC;
-
-    always @(*) begin
-        if (jr)
-            dest_PC = dest_addr;
+    
+    always @(negedge clk or negedge rst) begin
+        if(rst==1'b0)
+        PC=0;
+        else if (jr) 
+            PC = imm+PC;    
         else if ((beq && equal) || (bne && !equal)) 
-            dest_PC = dest_addr;
-        else if (jmp || jal)
-            dest_PC = {PC[31:28], instruction[25:0], 2'b00};
+            PC = imm+PC;
+        else if (jal) begin
+            adjacent_PC=PC+4;
+            PC = imm+PC;
+        end    
         else 
-            dest_PC = PC + 4;
+            PC = PC + 4;
     end
 
 
-    always @(negedge clk or posedge rst) begin
-        if (rst)
-            PC <= 0;
-        else
-            PC <= dest_PC;
-        if (jal)
-            adjacent_PC <= curr_PC + 4;
-    end
+//    always @(negedge clk) begin
+//        if (rst)
+//            PC <= 0;
+//        else
+//            PC <= dest_PC;
+//        if (jal)
+//            adjacent_PC <= curr_PC + 4;
+//    end
 
 
 endmodule

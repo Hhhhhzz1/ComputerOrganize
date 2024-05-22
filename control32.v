@@ -21,11 +21,10 @@
 
 
 module  control32(Instruction,Jr,Branch,Jal,
- Alu_resultHigh, 
 RegDST, MemorIOtoReg, RegWrite, 
 MemRead, MemWrite, 
 IORead, IOWrite,
- ALUSrc,ALUOp,Sftmd,I_format);
+ ALUSrc,ALUOp,Sftmd,I_format,rega7);
  
     input[31:0]  Instruction;               
     output       Jr;              // 1 indicates jr instruction TO ALU IF
@@ -40,8 +39,8 @@ IORead, IOWrite,
     output       Sftmd;         // 1 indicates shift instruction TO ALU
     output[1:0]  ALUOp;         // to ALU
     
-    
-    input[21:0] Alu_resultHigh;// From the execution unit Alu_Result[31..10]
+    input[31:0]rega7;//read a7 from register
+    //input[21:0] Alu_resultHigh;// From the execution unit Alu_Result[31..10]
     output MemorIOtoReg;  // 1 indicates that data needs to be read from memory or I/O to the register
     output MemRead;             // 1 indicates that the instruction needs to read from the memory
     output IORead;              // 1 indicates I/O read 
@@ -55,7 +54,7 @@ IORead, IOWrite,
     assign I_format=(opcode==7'b0010011||opcode==7'b0000011)?1:0;
     assign Sftmd=(((opcode==7'b0010011)||(opcode==7'b0110011))&&((Instruction[14:12]==3'h3)||(Instruction[14:12]==3'h2)||(Instruction[14:12]==3'h5)||(Instruction[14:12]==3'h1)))?1:0;
     assign Branch=(opcode==7'b1100011)?1:0;// beq bnq blt bge
-    assign ALUOp={(opcode==7'b0110011),Branch};
+    assign ALUOp={(opcode==7'b0110011),Branch};  //to add jal and jr
     assign RegDST=(opcode==7'b0110011||I_format);//R type I type
     assign ALUSrc=(opcode==7'b0110011)?0:1; // R=0 ELSE =1
     
@@ -63,11 +62,11 @@ IORead, IOWrite,
     wire sw=(opcode==7'b0100011)?1:0;
     
     
-    assign RegWrite = (opcode==7'b0110011||I_format);//R type I type      
-    assign IORead  = ((lw==1) && (Alu_resultHigh[21:0] == 22'h3FFFFF)) ? 1'b1:1'b0; 
-    assign IOWrite=((sw==1) && (Alu_resultHigh[21:0] == 22'h3FFFFF)) ? 1'b1:1'b0; 
-    assign MemWrite = ((sw==1) && (Alu_resultHigh[21:0] != 22'h3FFFFF)) ? 1'b1:1'b0;  
-    assign MemRead = ((lw==1) && (Alu_resultHigh[21:0] != 22'h3FFFFF))? 1'b1:1'b0;     
+    assign RegWrite = (opcode==7'b0110011||I_format||MemorIOtoReg);//R type I type      
+    assign IORead  = (rega7>=32'h00000000&&rega7<=32'h00000003) ? 1'b1:1'b0; 
+    assign IOWrite=(rega7>=32'h00000004&&rega7<=32'h00000005) ? 1'b1:1'b0; 
+    assign MemWrite = ((sw==1)) ? 1'b1:1'b0;  
+    assign MemRead = ((lw==1))? 1'b1:1'b0;     
     assign MemorIOtoReg = IORead || MemRead;   
 
 endmodule
