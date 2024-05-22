@@ -26,6 +26,7 @@ instruction,immNum,numRe1,numRe2,clk,r_wdata,ALUResult,MemtoReg,regWrite,reset,a
     reg[31:0] register[0:31];
     input regWrite,reset;
     wire [31:0]data;
+    wire [4:0]rd;
     input[31:0]instruction;
     input clk,MemtoReg,signextend;
     input[31:0] r_wdata,ALUResult;
@@ -46,16 +47,17 @@ instruction,immNum,numRe1,numRe2,clk,r_wdata,ALUResult,MemtoReg,regWrite,reset,a
     assign numRe1=register[instruction[19:15]];
     assign numRe2=(instruction == 32'h00000073&&(register[17]==4||register[17]==5))
     ?register[10]:register[instruction[24:20]];
-
+    assign rd=(instruction == 32'h00000073)?5'd10:instruction[11:7];
+    
     integer j;
-    always@(posedge clk or posedge reset)begin
-    if(reset) begin
+    always@(posedge clk or negedge reset)begin
+    if(reset==1'b0) begin
     for(j=0;j<=31;j=j+1) begin
         register[j] <= 0;
     end
     end
-    else if(regWrite==1'b1&&instruction[11:7]!=7'b0000000) begin
-    register[instruction[11:7]] <= data;
+    else if(regWrite==1'b1&&rd!=7'b0000000) begin
+    register[rd] <= data;
     end
     end
     

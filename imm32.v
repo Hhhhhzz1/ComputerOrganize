@@ -33,7 +33,7 @@ in,imm,signextend
         //add unsined extention
            case (sign)
                7'b1101111: imm=$signed({in[31],in[19:12],in[20],in[30:21],1'b0});//UJ
-               7'b1100011:imm=$signed({in[31],in[7],in[30:20],in[11:8],1'b0});//SB
+               7'b1100011:imm=$signed({in[31],in[7],in[30:25],in[11:8],1'b0});//SB
                7'b0100011: imm=$signed({in[31:25],in[11:7]});//S
                7'b0010011: imm=$signed(in[31:20]);//I_caculate
                7'b0110111: imm=$signed(in[31:12]);//U_lui  
