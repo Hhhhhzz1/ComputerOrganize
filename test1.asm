@@ -7,7 +7,7 @@
 # a7=3 read 8bit unsigned
 # a7=4 write 16bit to led
 
-#a7=5 deligt
+#a7=5 write shuma
 
 
 readtestcase:
