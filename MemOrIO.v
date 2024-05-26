@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module MemOrIO( mRead, mWrite, ioRead, ioWrite,addr_in, addr_out, m_rdata, io_rdata, r_wdata, r_rdata, write_data, LEDCtrl,ConfirmCtrl,test_index,rega7,signextend);
+module MemOrIO( mRead,mWrite, ioRead, ioWrite,addr_in, addr_out, m_rdata, io_rdata, r_wdata, r_rdata, write_data, LEDCtrl,ConfirmCtrl,test_index,rega7,signextend);
 input mRead; // read memory, from Controller
 input mWrite; // write memory, from Controller
 input ioRead; // read IO, from Controller
@@ -32,7 +32,7 @@ input[7:0] io_rdata; // data read from IO,8 bits bond bomakaiguan
 output reg[31:0] r_wdata; // data to Decoder(register file)
 input[31:0] r_rdata; // data read from Decoder(register file)
 output reg[31:0] write_data; // data to memory or I/O（m_wdata, io_wdata）
-output reg LEDCtrl; // LED Chip Select 
+output LEDCtrl; // LED Chip Select 
 
 //output SwitchCtrl; // Switch Chip Selec
 input ConfirmCtrl;//bond bomakaiguan
@@ -44,25 +44,39 @@ assign addr_out= addr_in;
 assign signextend=(rega7==1)?1'b1:1'b0;
 // The data wirte to register file may be from memory or io. // While the data is from io, it should be the lower 16bit of r_wdata. assign r_wdata = ？？？
 // Chip select signal of Led and Switch are all active high;
+
 always@(*)begin
 if(ioRead)begin
-if(rega7==32'h00000001||rega7==32'h00000003)r_wdata=io_rdata; //data
-else if(rega7==32'h00000000)r_wdata=ConfirmCtrl; //confirm
-else if(rega7==32'h00000002)r_wdata=test_index;//index
-else r_wdata=32'b0;
+if(rega7==1||rega7==3)r_wdata=io_rdata; //data
+else if(rega7==0)r_wdata=ConfirmCtrl; //confirm
+else if(rega7==2)r_wdata=test_index;//index
+else r_wdata=0;
 
 end
-else begin
-
+else if(mRead==1'b1)begin
 r_wdata=m_rdata;
-
-
 end
 
 
 end
 
-
+//always @(*) begin
+//        if(ioRead)begin
+//            if ((addr_in >= 32'hffff_f600) && (addr_in <= 32'hffff_f700)) begin//input data
+//                r_wdata=io_rdata;
+//            end
+//            else if((addr_in >= 32'hffff_f500) && (addr_in <= 32'hffff_f600)) begin//input ctrl
+//                r_wdata=ConfirmCtrl;
+//            end
+//            else if((addr_in >= 32'hffff_f400) && (addr_in <= 32'hffff_f500)) begin//input test_index
+//                r_wdata=test_index;
+//            end else
+//                r_wdata= 0;
+//        end
+//        else if(mRead==1'b1)begin
+//            r_wdata=m_rdata;
+//        end
+//   end
 
 
 
@@ -77,11 +91,15 @@ write_data = r_rdata;
 
 end
 
-always @(*) begin
+//always @(*) begin
 
-if((ioWrite==1)&&rega7==32'h00000004)
-LEDCtrl=1'b1;
-else if((ioWrite==1)&&rega7==32'h00000005)
-LEDCtrl=1'b0;
-end
+//if((ioWrite==1)&&rega7==32'h00000004)
+//LEDCtrl=1'b1;
+//else if((ioWrite==1)&&rega7==32'h00000005)
+//LEDCtrl=1'b0;
+//end
+assign LEDCtrl=
+((ioWrite==1)&&rega7==4)
+//((addr_in >= 32'hffff_f600) && ((addr_in <= 32'hffff_f790)) && (ioWrite == 1))
+?1'b1:1'b0;
 endmodule
