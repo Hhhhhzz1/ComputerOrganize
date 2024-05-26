@@ -25,46 +25,44 @@ rst,LEDCtrl,write_data,light_data,an,clk
     );
     input rst,clk;
     input LEDCtrl;
-    input[31:0]write_data;
-    output reg[7:0]an;
+    input[15:0]write_data;
+    output reg[3:0]an;
     output reg[6:0] light_data;
+    reg [15:0]data;
+    always@(negedge clk or negedge rst) begin
+     if(rst==1'b0)data=0;
+    else 
+    if(LEDCtrl==1)data=write_data;
+//    else data=16'h0000;
+    end
     
-    
-    reg[16:0] clkdiv=0;
+    reg[18:0] clkdiv;
     reg[3:0] display;// diaplay state
     always @(posedge clk ) begin
         clkdiv<=clkdiv+1;
     end
     
-    wire [2:0] sign;
-    assign sign=clkdiv[16:14];
+    wire [1:0] sign;
+    assign sign=clkdiv[18:17];
     always @(*) begin
     if(rst==1'b0)
-      an=8'b00000001;
+      an=4'b1000;
     else begin
-            case (sign)
-      3'b000: an=8'b10000000;
-      3'b001: an=8'b01000000;
-      3'b010: an=8'b00100000;
-      3'b011: an=8'b00010000;
-      3'b100: an=8'b00001000;
-      3'b101: an=8'b00000100;
-      3'b110: an=8'b00000010;  
-      3'b111: an=8'b00000001;      
+         case (sign)
+          2'b00: an=4'b1000;
+         2'b01: an=4'b0100;
+         2'b10: an=4'b0010; 
+         2'b11: an=4'b0001;  
     endcase
     end
     end
     
     always @(*)begin
      case(sign)
-       3'b000:display=write_data[31:28];
-       3'b001:display=write_data[27:24];
-       3'b010:display=write_data[23:20];
-       3'b011:display=write_data[19:16];
-       3'b100:display=write_data[15:12];
-       3'b101:display=write_data[11:8];
-       3'b110:display=write_data[7:4];
-       3'b111:display=write_data[3:0];
+      2'b00: display=data[15:12];
+      2'b01: display=data[11:8];
+      2'b10: display=data[7:4];
+      2'b11: display=data[3:0];
      endcase 
     end    
      always @(*) begin
@@ -88,7 +86,7 @@ rst,LEDCtrl,write_data,light_data,an,clk
            4'd15:light_data=7'b1000111;//F
            
            
-           default:light_data=7'b0000001;//nothing to test
+           default:light_data=7'b0000000;//nothing to test
            endcase
            
        end
