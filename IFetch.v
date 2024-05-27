@@ -7,30 +7,28 @@ module IFetch(
     
     input[31:0] instruction,
     input[31:0] imm,  //  destination address from ALU
-//    input[31:0] jalr_addr,  //  address from `jalr` instruction
+    input[31:0] rs,  //  address from `jalr` instruction
     
     input     beq,
-    input     bne,
     input     equal,
     input     jal,
     input     jr,
 
 
     output reg [31:0] adjacent_PC,  // store the adjacent next instruction address of the current one 
-    output reg [31:0] PC            // next PC
+    output reg [31:0] PC          // next PC
     
 );
-
-    wire [31:0] curr_PC;
-    reg [31:0] dest_PC;
-    assign curr_PC = PC;
     
+
+    reg [31:0] dest_PC;
+   
     always @(negedge clk or negedge rst) begin
         if(rst==1'b0)
         PC=0;
         else if (jr) 
-            PC = imm+PC;    
-        else if ((beq && equal) || (bne && !equal)) 
+            PC = rs; 
+        else if ((beq && equal)) 
             PC = imm+PC;
         else if (jal) begin
             adjacent_PC=PC+4;
