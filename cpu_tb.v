@@ -33,19 +33,25 @@ module cpu_tb(
         reg start_pg=1'b0;
         reg rx=1'b0;
         wire tx;
-        wire [7:0] io_rdata=12;
+        reg [7:0] io_rdata=8'b11111111;
        CPU cpu_c(.clk(clk),.rst(rst),.ConfirmCtrl(ConfirmCtrl),.io_rdata(io_rdata),.light_data2(light_data2),
        .test_index(test_index),.led_data(led_data),.start_pg(start_pg),.rx(rx),
        .tx(tx),.an(an),.light_data(light_data));
         initial begin
          clk=1'b1;rst=1'b1;
+         #5 rst=1'b0;
+         #10 rst=1'b1;
          forever #5 clk=~clk;
          end
          initial begin
          
          #1300 ConfirmCtrl=1'b1;
          #1350 ConfirmCtrl=1'b0;
+
          #1600 ConfirmCtrl=1'b1;
          #1650 ConfirmCtrl=1'b0;
+         #1750 io_rdata=8'b00111100;
+         #1800 ConfirmCtrl=1'b1;
+         #1850 ConfirmCtrl=1'b0;
          end
 endmodule
