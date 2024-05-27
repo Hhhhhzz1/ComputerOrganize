@@ -36,29 +36,47 @@ ReadData1, ReadData2,imm32,zero,ALUResult,ALUOp,ALUSrc,funct3,funct7
     always @(*) begin
     case(ALUOp)
        2'b00:ALUResult=(realData+ReadData1);
-       2'b01:ALUResult=(ReadData1-realData);
+       2'b01:
+       begin  //unsigned or signed
+       case(funct3)
+       3'b110,3'b111:ALUResult=(ReadData1-realData);
+       default:
+       begin 
+       
+       ALUResult=($signed(ReadData1)-$signed(realData)); 
+       end
+       endcase
+       end
        2'b10:
        begin
-         case({funct7,funct3})
-          10'b0000000000:ALUResult=(realData+ReadData1);
-          10'b0100000000:ALUResult=(ReadData1-realData);
-          10'b0000000111:ALUResult=(ReadData1&realData);
-          10'b0000000110:ALUResult=(ReadData1|realData);
-          endcase
+           case(funct3)
+           3'b000,3'b010:ALUResult=(realData+ReadData1);//add or addi
+           3'b100:ALUResult=(ReadData1^realData);//xor
+           3'b110:ALUResult=(ReadData1|realData);//or
+           3'b111:ALUResult=(ReadData1&realData);//and
+           3'b001:ALUResult=(ReadData1<<realData);//sll or slli
+           3'b101:begin
+           case(funct7)
+           7'd0:ALUResult=(ReadData1>>realData);
+           7'd4:ALUResult=($signed(ReadData1)>>realData);        
+           endcase
+           end//srl or srli
+           endcase
        end
-       
+       2'b11:ALUResult=(realData << 12);//lui
     endcase
     end
     always @(*) begin
     if(ALUOp==2'b01) begin
     case(funct3)
-    3'b100:zero =(ALUResult<=0)?1:0;
-    3'b101:zero =(ALUResult>=0)?1:0;
-    3'b001:zero =(ALUResult==1)?1:0;
-    3'b000: zero =(ALUResult==0)?1:0;
+    3'b100,3'b110:zero =($signed(ALUResult)<0)?1:0;
+    3'b101,3'b111:zero =($signed(ALUResult)>=0)?1:0;
+    3'b001:zero =($signed(ALUResult)!=0)?1:0;
+    3'b000: zero =($signed(ALUResult)==0)?1:0;
     default:zero=0;
     endcase
     end
-    
+    else
+    zero=0;
     end
 endmodule
