@@ -1,10 +1,11 @@
 .text
 readtestcase:
+addi s10,zero,1
 ##read testcase##
 addi a7,zero,0
 readtest_1:
 ecall
-bne zero,a0,readtest_1
+beq s10,a0,readtest_1
 readtest_2:
 ecall
 beq zero,a0,readtest_2
@@ -39,13 +40,14 @@ case0:
 	add a7, zero, zero   # a7 = 0
 input1_1:
 	ecall
-	bne zero, a0, input1_1	  # if a0 != 0, hold
+	beq s10, a0, input1_1	  # if a0 != 0, hold
 input1_2:
 	ecall
 	beq zero, a0, input1_2   #  if a0 == 0, hold
 	addi a7, zero, 1           # a7=1 read 8bit signed
 	ecall
-	addi t0, a0, 0    # t0 = input
+	addi t0, a0, 0
+	slli t0,t0,24    # t0 = input
 	
 	add t1, zero, zero   # counter
 	addi t2, zero, 8      # t2 = 8, control the length of loop
@@ -62,7 +64,7 @@ done1:
 addi a7,zero,0
 output01_1:
 ecall
-bne zero,a0,output01_1 #set confirm to 0 to display output
+beq s10,a0,output01_1 #set confirm to 0 to display output
 output01_2:
 addi a7,zero,4
 addi a0,s2,0
@@ -79,7 +81,7 @@ case1:
 	addi a7, zero, 0       # a7=0
 input2_high_1:
 	ecall                  
-	bne zero, a0, input2_high_1  # if not zero, hold
+	beq s10, a0, input2_high_1  # if not zero, hold
 input2_high_2:
 	ecall
 	beq zero, a0, input2_high_2  # if zero, hold
@@ -91,7 +93,7 @@ input2_high_2:
 	addi a7, zero, 0       # a7=0
 input2_low_1:
 	ecall                  
-	bne zero, a0, input2_low_1   # if not zero, hold
+	beq s10, a0, input2_low_1   # if not zero, hold
 input2_low_2:
 	ecall                   
 	beq zero, a0, input2_low_2  # if zero, hold
@@ -137,7 +139,7 @@ positive2:
 	addi a7,zero,0
 output21_1:
 ecall
-bne zero,a0,output21_1 #set confirm to 0 to display output
+beq s10,a0,output21_1 #set confirm to 0 to display output
 output21_2:
 addi a7,zero,4
 addi a0,t4,0
@@ -156,7 +158,7 @@ case2:
     addi a7, zero, 0       # a7=0
 input3_high_1:
     ecall                  
-    bne zero, a0, input3_high_1  # if not zero, hold
+    beq s10, a0, input3_high_1  # if not zero, hold
 input3_high_2:
     ecall
     beq zero, a0, input3_high_2  # if zero, hold
@@ -167,7 +169,7 @@ input3_high_2:
     addi a7, zero, 0       # a7=0
 input3_low_1:
     ecall                  
-    bne zero, a0, input3_low_1   # if not zero, hold
+    beq s10, a0, input3_low_1   # if not zero, hold
 input3_low_2:
     ecall                   
     beq zero, a0, input3_low_2  # if zero, hold
@@ -217,7 +219,7 @@ positive3:
    addi a7,zero,0
 output31_1:
 ecall
-bne zero,a0,output31_1 #set confirm to 0 to display output
+beq s10,a0,output31_1 #set confirm to 0 to display output
 output31_2:
 addi a7,zero,4
 addi a0,t4,0 
@@ -236,7 +238,7 @@ case3:
     addi a7, zero, 0       # a7=0
 input4_high_1:
     ecall                  
-    bne zero, a0, input4_high_1  # if not zero, hold
+    beq s10, a0, input4_high_1  # if not zero, hold
 input4_high_2:
     ecall
     beq zero, a0, input4_high_2  # if zero, hold
@@ -247,7 +249,7 @@ input4_high_2:
     addi a7, zero, 0       # a7=0
 input4_low_1:
     ecall                  
-    bne zero, a0, input4_low_1   # if not zero, hold
+    beq s10, a0, input4_low_1   # if not zero, hold
 input4_low_2:
     ecall                   
     beq zero, a0, input4_low_2  # if zero, hold
@@ -306,7 +308,7 @@ positive4:
    addi a7,zero,0
 output41_1:
 ecall
-bne zero,a0,output41_1 #set confirm to 0 to display output
+beq s10,a0,output41_1 #set confirm to 0 to display output
 output41_2:
 addi a7,zero,4
 addi a0,t4,0 
@@ -322,7 +324,7 @@ case4:
 addi a7,zero,0
 input51_1:
 ecall
-bne zero,a0,input51_1
+beq s10,a0,input51_1
 input51_2:
 ecall
 beq zero,a0,input51_2
@@ -334,7 +336,7 @@ addi a1,a0,0 #move input1 to a1
 addi a7,zero,0
 input52_1:
 ecall
-bne zero,a0,input52_1
+beq s10,a0,input52_1
 input52_2:
 ecall
 beq zero,a0,input52_2
@@ -342,14 +344,15 @@ addi a7,zero,3
 ecall #read input
 addi a2,a0,0 #move input2 to a2
 add a3,a1,a2
-andi a5,a3,255  #take low 8bit
-srli a4,a3,8
-add a3,a4,a5
+andi a5,a3,255  #take low 8bit 1_0111_0110
+srli a4,a3,8 
+add a3,a4,a5  #0111_0110
 xori a3,a3,-1
+andi a3,a3,255
 addi a7,zero,0
 output51_1:
 ecall
-bne zero,a0,output51_1 #set confirm to 0 to display output
+beq s10,a0,output51_1 #set confirm to 0 to display output
 output51_2:
 addi a7,zero,4
 addi a0,a3,0
@@ -366,7 +369,7 @@ case5:
 addi a7,zero,0
 input61_1:
 ecall
-bne zero,a0,input61_1
+beq s10,a0,input61_1
 input61_2:
 ecall
 beq zero,a0,input61_2
@@ -378,7 +381,7 @@ addi a1,a0,0 #move input1 to a1 low 8bit
 addi a7,zero,0
 input62_1:
 ecall
-bne zero,a0,input62_1
+beq s10,a0,input62_1
 input62_2:
 ecall
 beq zero,a0,input62_2
@@ -392,7 +395,7 @@ add a3,a2,a1 #12bit input
 addi a7,zero,0
 output61_1:
 ecall
-bne zero,a0,output61_1 #set confirm to 0 to display output
+beq s10,a0,output61_1 #set confirm to 0 to display output
 output61_2:
 addi a7,zero,4
 addi a0,a3,0
@@ -408,57 +411,161 @@ case6:
 addi a7,zero,0
 input71_1:
 ecall
-bne zero,a0,input71_1
+beq s10,a0,input71_1
 input71_2:
 ecall
 beq zero,a0,input71_2
 addi a7,zero,3 
 ecall #read input
-addi sp,sp,0
-jal ra,fib
-addi a1,a0,0
+addi s2,a0,0 #s2=input
+addi s3,zero,0 #s3=fib(n)
+addi s4,zero,0 #s4=stack count
+addi s5,zero,1 #i
+addi sp,zero,0
+loop6:
+bge s3,s2,outloop6
+addi a0,s5,0
+jal fib
+addi s3,a0,0
+addi s5,s5,1 #i++
+beq zero,zero,loop6
+outloop6:
+
+output72_1:
+addi a7,zero,0
+ecall
+beq s10,a0,output72_1  #set confirm 0 to display
+output72_2:
+addi a7,zero,4
+addi a0,s5,-1
+ecall
+addi a7,zero,0
+ecall
+beq a0,zero,output72_2 #set confirm 1 to continue
+
+
 output71_1:
 addi a7,zero,0
 ecall
-bne a0,zero,output71_1  #set confirm 0 to display
+beq s10,a0,output71_1  #set confirm 0 to display
 output71_2:
 addi a7,zero,4
-addi a0,a1,0
+addi a0,s4,0
 ecall
 addi a7,zero,0
 ecall
-beq a0,zero,output71_1 #set confirm 1 to continue
+beq a0,zero,output71_2 #set confirm 1 to continue
 
 
 beq zero,zero,readtestcase
 
 case7:
-beq zero,zero,readtestcase
+## read input1 ##
+addi a7,zero,0
+input81_1:
+ecall
+beq s10,a0,input81_1
+input81_2:
+ecall
+beq zero,a0,input81_2
+addi a7,zero,3 
+ecall #read input
+addi s2,a0,0 #s2=input
+addi s3,zero,0 #s3=fib(n)
+addi s5,zero,1 #i
+addi sp,zero,0
+loop7:
+bge s3,s2,outloop7
+addi a1,s5,0
+jal fib1
+addi s3,a1,0
+addi s5,s5,1 #i++
+beq zero,zero,loop7
+outloop7:
 
-#a0 canshu
+output82_1:
+addi a7,zero,0
+ecall
+beq s10,a0,output82_1  #set confirm 0 to display
+output82_2:
+addi a7,zero,4
+addi a0,a5,-1
+ecall
+addi a7,zero,0
+ecall
+beq a0,zero,output82_2 #set confirm 1 to continue
+
+
+
+
+
+beq zero,zero,readtestcase
+#a1 canshu
 fib:
+addi s4,s4,1 ## in stack
 addi sp,sp,8
-sw a0,-4(sp)
+sw a1,-4(sp)
 sw ra,-8(sp)
 addi t1,zero,3
-bge a0,t1,L1
-addi a0,zero,1
+bge a1,t1,L1
+addi a1,zero,1
 addi sp,sp,-8
+addi s4,s4,1 ## out stack
 jalr zero,0(ra)
 
 L1:
 
-addi a0,a0,-1
+addi a1,a1,-1
 jal fib
 addi sp,sp,4
-sw a0,-4(sp)
+sw a1,-4(sp)
 lw t2,-8(sp)
-addi a0,t2,-2
+addi a1,t2,-2
 jal fib
 lw t1,-4(sp)
-add a0,a0,t1
+add a1,a1,t1
+lw ra,-12(sp)
+addi sp,sp,-12
+addi s4,s4,1 ## out stack
+jalr zero,0(ra)
+
+
+
+#a0 canshu
+fib1:
+output81_1:
+addi a7,zero,0
+ecall
+beq s10,a0,output81_1  #set confirm 0 to display
+output81_2:
+addi a7,zero,4
+addi a0,a1,0
+ecall
+addi a7,zero,0
+ecall
+beq a0,zero,output81_2 #set confirm 1 to continue
+
+addi sp,sp,8
+sw a1,-4(sp)
+sw ra,-8(sp)
+addi t1,zero,3
+bge a1,t1,L11
+addi a1,zero,1
+addi sp,sp,-8
+jalr zero,0(ra)
+
+L11:
+
+addi a1,a1,-1
+jal fib1
+addi sp,sp,4
+sw a1,-4(sp)
+lw t2,-8(sp)
+addi a1,t2,-2
+jal fib1
+lw t1,-4(sp)
+add a1,a1,t1
 lw ra,-12(sp)
 addi sp,sp,-12
 jalr zero,0(ra)
-
 
