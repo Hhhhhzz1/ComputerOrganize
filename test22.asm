@@ -166,24 +166,24 @@ beq zero,zero,readtestcase
 case2:
 
 	addi a7, zero, 0       # a7=0
-input2_high_1:
+input3_high_1:
 	ecall                  
-	bne zero, a0, input2_high_1  # if not zero, hold
-input2_high_2:
+	bne zero, a0, input3_high_1  # if not zero, hold
+input3_high_2:
 	ecall
-	beq zero, a0, input2_high_2  # if zero, hold
+	beq zero, a0, input3_high_2  # if zero, hold
 	addi a7, zero, 3       # a7=3, read 8bit unsigned
 	ecall
 	slli t0, a0, 8         # store high 8 bits to t0
 
 
 	addi a7, zero, 0       # a7=0
-input2_low_1:
+input3_low_1:
 	ecall                  
-	bne zero, a0, input2_low_1   # if not zero, hold
-input2_low_2:
+	bne zero, a0, input3_low_1   # if not zero, hold
+input3_low_2:
 	ecall                   
-	beq zero, a0, input2_low_2  # if zero, hold
+	beq zero, a0, input3_low_2  # if zero, hold
 	addi a7, zero, 3       # a7=3, read 8bit unsigned
 	ecall
 	or t0, t0, a0         # store low 8 bits to t0,   the orginal input is stored in lower 16 bits in t0
@@ -203,7 +203,7 @@ input2_low_2:
 
 
         #bge zero,t2, is_zero2  
-	blt t2, zero, is_zero2   # if t2 < 0
+	blt t2, zero, is_zero3   # if t2 < 0
 	#beq t2, zero, is_zero2     #  if t2 == 0
 
 	#sll t4, t3, t2 
@@ -211,35 +211,35 @@ input2_low_2:
 	 
 	       
 	sll t4, t3, t2  # t4 store the integer part
-	beq zero, zero check_fraction2
+	beq zero, zero check_fraction3
 
-is_zero2:
+is_zero3:
         xori t2, t2, -1  
         addi t2,t2,1
         srl t4,t3,t2     
 
-check_fraction2:
+check_fraction3:
         srli t4,t4,9
         srli t4,t4,1
 	
 
-check_sign2:
-	beq t1, zero, positive2 # if t1 (sign bit) == 0, then positive
+check_sign3:
+	beq t1, zero, positive3 # if t1 (sign bit) == 0, then positive
 	xori t4, t4, -1             # else   neg t4
 	addi t4, t4, 1
 
-positive2:
+positive3:
 	addi a7,zero,0
-output21_1:
+output31_1:
 ecall
-bne zero,a0,output21_1 #set confirm to 0 to display output
-output21_2:
+bne zero,a0,output31_1 #set confirm to 0 to display output
+output31_2:
 addi a7,zero,4
 addi a0,t4,0
 ecall #write reg a0 to led
 addi a7,zero,0
 ecall
-beq a0,zero,output21_2 #set confirm to 1 to continue
+beq a0,zero,output31_2 #set confirm to 1 to continue
 
 
 beq zero,zero,readtestcase  
@@ -251,24 +251,24 @@ beq zero,zero,readtestcase
 case3:
 
 	addi a7, zero, 0       # a7=0
-input2_high_1:
+input4_high_1:
 	ecall                  
-	bne zero, a0, input2_high_1  # if not zero, hold
-input2_high_2:
+	bne zero, a0, input4_high_1  # if not zero, hold
+input4_high_2:
 	ecall
-	beq zero, a0, input2_high_2  # if zero, hold
+	beq zero, a0, input4_high_2  # if zero, hold
 	addi a7, zero, 3       # a7=3, read 8bit unsigned
 	ecall
 	slli t0, a0, 8         # store high 8 bits to t0
 
 
 	addi a7, zero, 0       # a7=0
-input2_low_1:
+input4_low_1:
 	ecall                  
-	bne zero, a0, input2_low_1   # if not zero, hold
-input2_low_2:
+	bne zero, a0, input4_low_1   # if not zero, hold
+input4_low_2:
 	ecall                   
-	beq zero, a0, input2_low_2  # if zero, hold
+	beq zero, a0, input4_low_2  # if zero, hold
 	addi a7, zero, 3       # a7=3, read 8bit unsigned
 	ecall
 	or t0, t0, a0         # store low 8 bits to t0,   the orginal input is stored in lower 16 bits in t0
@@ -296,38 +296,38 @@ input2_low_2:
 	 
 	       
 	sll t4, t3, t2  # t4 store the integer part
-	beq zero, zero check_fraction2
+	beq zero, zero check_fraction4
 
-is_zero2:
+is_zero4:
         xori t2, t2, -1  
         addi t2,t2,1
         srl t4,t3,t2     
 
-check_fraction2:
+check_fraction4:
         srli t4,t4,9
         andi t5,t4,1
         srli t4,t4,1
 	#addi t5, t0, 0x3ff    # t5 store the number in last position
-	beq t5, zero, check_sign2   # if   t5 == 0,  not round
+	beq t5, zero, check_sign4   # if   t5 == 0,  not round
 	addi t4, t4, 0x1         #  else , round, i.e t4++
 
-check_sign2:
-	beq t1, zero, positive2 # if t1 (sign bit) == 0, then positive
+check_sign4:
+	beq t1, zero, positive4 # if t1 (sign bit) == 0, then positive
 	xori t4, t4, -1             # else   neg t4
 	addi t4, t4, 1
 
-positive2:
+positive4:
 	addi a7,zero,0
-output21_1:
+output41_1:
 ecall
-bne zero,a0,output21_1 #set confirm to 0 to display output
-output21_2:
+bne zero,a0,output41_1 #set confirm to 0 to display output
+output41_2:
 addi a7,zero,4
 addi a0,t4,0
 ecall #write reg a0 to led
 addi a7,zero,0
 ecall
-beq a0,zero,output21_2 #set confirm to 1 to continue
+beq a0,zero,output41_2 #set confirm to 1 to continue
 
 
 beq zero,zero,readtestcase
@@ -581,4 +581,3 @@ add a1,a1,t1
 lw ra,-12(sp)
 addi sp,sp,-12
 jalr zero,0(ra)
-
