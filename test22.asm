@@ -424,9 +424,9 @@ addi s5,zero,1 #i
 addi sp,zero,0
 loop6:
 bge s3,s2,outloop6
-addi a0,s5,0
+addi a1,s5,0
 jal fib
-addi s3,a0,0
+addi s3,a1,0
 addi s5,s5,1 #i++
 beq zero,zero,loop6
 outloop6:
