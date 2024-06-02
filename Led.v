@@ -29,8 +29,8 @@ rst,LEDCtrl,write_data,led_data,clk
  input[31:0]write_data;
  output reg[15:0] led_data;
  
- always@(negedge clk or negedge rst)begin
- if(rst==1'b0)led_data=16'b0;
+ always@(negedge clk or posedge rst)begin
+ if(rst==1'b1)led_data=16'b0;
  else begin
  if(LEDCtrl==1)led_data=write_data[15:0];
 //else led_data=0;
