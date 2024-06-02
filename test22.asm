@@ -81,7 +81,7 @@ case1:
 	addi a7, zero, 0       # a7=0
 input2_high_1:
 	ecall                  
-	beq s10, a0, input2_high_1  # if not zero, hold
+	bne zero, a0, input2_high_1  # if not zero, hold
 input2_high_2:
 	ecall
 	beq zero, a0, input2_high_2  # if zero, hold
@@ -93,7 +93,7 @@ input2_high_2:
 	addi a7, zero, 0       # a7=0
 input2_low_1:
 	ecall                  
-	beq s10, a0, input2_low_1   # if not zero, hold
+	bne zero, a0, input2_low_1   # if not zero, hold
 input2_low_2:
 	ecall                   
 	beq zero, a0, input2_low_2  # if zero, hold
@@ -101,34 +101,42 @@ input2_low_2:
 	ecall
 	or t0, t0, a0         # store low 8 bits to t0,   the orginal input is stored in lower 16 bits in t0
 
-	lui t1, 32768
+	lui t1, 8
 	and t1, t0, t1   # t1 store the sign bit(0x8000 = 32768)
-    srli t1, t1, 15       # move to the lowest
+        srli t1, t1, 15       # move to the lowest
 	
-	lui t2, 31744
-	srli t2, t2, 15
+	addi t2,zero,0x7c
+	slli t2,t2,8
 	and t2, t0, t2
 	   
 	srli t2, t2, 10        # t2 store the expo part  (lower bits)
-	addi t2, t2, -15       # sub bias
-	andi t3, t0, 1023    # t3 store the frac part  (lower bits)
-	ori t3, t3, 1024     #   add 1 in the begining
+	addi t2, t2, -7       # sub bias
+	andi t3, t0, 0x3ff   # t3 store the frac part  (lower bits)
+	addi t3, t3, 0x400     #   add 1 in the begining
 
 
+        #bge zero,t2, is_zero2  
 	blt t2, zero, is_zero2   # if t2 < 0
-	beq t2, zero, is_zero2     #  if t2 == 0
+	#beq t2, zero, is_zero2     #  if t2 == 0
 
-	sll t4, t3, t2         # t4 store the integer part
+	#sll t4, t3, t2 
+	
+	 
+	       
+	sll t4, t3, t2  # t4 store the integer part
 	beq zero, zero check_fraction2
 
 is_zero2:
-	addi t4, zero, 0       # t4 = 0
-	beq zero, zero check_sign2
+        xori t2, t2, -1  
+        addi t2,t2,1
+        srl t4,t3,t2     
 
 check_fraction2:
-	andi t5, t0, 1023    # t5 store frac part
+        
+        andi t5,t4,0x3ff
+        srli t4,t4,10
 	beq t5, zero, check_sign2   # if   t5 == 0,  not round
-	addi t4, t4, 1         #  else , round, i.e t4++
+	addi t4, t4, 0x1         #  else , round, i.e t4++
 
 check_sign2:
 	beq t1, zero, positive2 # if t1 (sign bit) == 0, then positive
@@ -139,7 +147,7 @@ positive2:
 	addi a7,zero,0
 output21_1:
 ecall
-beq s10,a0,output21_1 #set confirm to 0 to display output
+bne zero,a0,output21_1 #set confirm to 0 to display output
 output21_2:
 addi a7,zero,4
 addi a0,t4,0
@@ -149,84 +157,88 @@ ecall
 beq a0,zero,output21_2 #set confirm to 1 to continue
 
 
+
 beq zero,zero,readtestcase
 	
 	           
 	                      
 #------------------case3------------------#
 case2:
-    addi a7, zero, 0       # a7=0
+
+	addi a7, zero, 0       # a7=0
 input3_high_1:
-    ecall                  
-    beq s10, a0, input3_high_1  # if not zero, hold
+	ecall                  
+	bne zero, a0, input3_high_1  # if not zero, hold
 input3_high_2:
-    ecall
-    beq zero, a0, input3_high_2  # if zero, hold
-    addi a7, zero, 3       # a7=3, read 8bit unsigned
-    ecall
-    slli t0, a0, 8         # store high 8 bits to t0
+	ecall
+	beq zero, a0, input3_high_2  # if zero, hold
+	addi a7, zero, 3       # a7=3, read 8bit unsigned
+	ecall
+	slli t0, a0, 8         # store high 8 bits to t0
 
-    addi a7, zero, 0       # a7=0
+
+	addi a7, zero, 0       # a7=0
 input3_low_1:
-    ecall                  
-    beq s10, a0, input3_low_1   # if not zero, hold
+	ecall                  
+	bne zero, a0, input3_low_1   # if not zero, hold
 input3_low_2:
-    ecall                   
-    beq zero, a0, input3_low_2  # if zero, hold
-    addi a7, zero, 3       # a7=3, read 8bit unsigned
-    ecall
-    or t0, t0, a0         # store low 8 bits to t0, the original input is stored in lower 16 bits in t0
+	ecall                   
+	beq zero, a0, input3_low_2  # if zero, hold
+	addi a7, zero, 3       # a7=3, read 8bit unsigned
+	ecall
+	or t0, t0, a0         # store low 8 bits to t0,   the orginal input is stored in lower 16 bits in t0
 
-    lui t1, 32768
+	lui t1, 8
 	and t1, t0, t1   # t1 store the sign bit(0x8000 = 32768)
-    srli t1, t1, 15       # move to the lowest
-    
-    
-	lui t2, 31744
-	srli t2, t2, 15
+        srli t1, t1, 15       # move to the lowest
+	
+	addi t2,zero,0x7c
+	slli t2,t2,8
 	and t2, t0, t2
-    
-    srli t2, t2, 10        # t2 store the expo part (lower bits)
-    addi t2, t2, -15       # sub bias
-    andi t3, t0, 1023    # t3 store the frac part (0x03FF = 1023)
-    ori t3, t3, 1024     # add 1 in the beginning (0x0400 = 1024)
+	   
+	srli t2, t2, 10        # t2 store the expo part  (lower bits)
+	addi t2, t2, -7       # sub bias
+	andi t3, t0, 0x3ff   # t3 store the frac part  (lower bits)
+	addi t3, t3, 0x400     #  add 1 in the begining
 
-    blt t2, zero, is_zero3  # if t2 < 0
-    beq t2, zero, is_zero3  # if t2 == 0
 
-    sll t4, t3, t2         # t4 store the integer part
-    beq zero, zero  check_fraction3
+        #bge zero,t2, is_zero2  
+	blt t2, zero, is_zero3   # if t2 < 0
+	#beq t2, zero, is_zero2     #  if t2 == 0
+
+	#sll t4, t3, t2 
+	
+	 
+	       
+	sll t4, t3, t2  # t4 store the integer part
+	beq zero, zero check_fraction3
 
 is_zero3:
-    addi t4, zero, 0       # t4 = 0
-    beq zero, zero check_sign3
-
+        addi t4,zero,0    
+        j positive3
 check_fraction3:
-    andi t5, t0, 1023    # t5 store frac part (0x03FF = 1023)
-    beq t5, zero, check_sign3  # if t5 == 0, not round
-    
-    # Modify to floor operation
-    bne t1, zero, check_sign3  # if t1 (sign bit) != 0, then positive,  skip rounding for negative numbers
-    addi t4, t4, -1         # else negative and fraction part != 0, floor (t4 - -)
+        srli t4,t4,9
+        srli t4,t4,1
+	
 
 check_sign3:
-    beq t1, zero, positive3  # if t1 (sign bit) == 0, then positive
-    # Handle negative numbers without using neg
-    xori t4, t4, -1         # else neg t4 
-    addi t4, t4, 1          
+	beq t1, zero, positive3 # if t1 (sign bit) == 0, then positive
+	xori t4, t4, -1             # else   neg t4
+	addi t4, t4, 1
 
 positive3:
-   addi a7,zero,0
+	addi a7,zero,0
 output31_1:
 ecall
-beq s10,a0,output31_1 #set confirm to 0 to display output
+bne zero,a0,output31_1 #set confirm to 0 to display output
 output31_2:
 addi a7,zero,4
-addi a0,t4,0 
+addi a0,t4,0
 ecall #write reg a0 to led
 addi a7,zero,0
 ecall
 beq a0,zero,output31_2 #set confirm to 1 to continue
+
 
 beq zero,zero,readtestcase  
                
@@ -235,87 +247,86 @@ beq zero,zero,readtestcase
 	                                                                                                                        
 #---------------case4-------------------#
 case3:
-    addi a7, zero, 0       # a7=0
+
+	addi a7, zero, 0       # a7=0
 input4_high_1:
-    ecall                  
-    beq s10, a0, input4_high_1  # if not zero, hold
+	ecall                  
+	bne zero, a0, input4_high_1  # if not zero, hold
 input4_high_2:
-    ecall
-    beq zero, a0, input4_high_2  # if zero, hold
-    addi a7, zero, 3       # a7=3, read 8bit unsigned
-    ecall
-    slli t0, a0, 8         # store high 8 bits to t0
+	ecall
+	beq zero, a0, input4_high_2  # if zero, hold
+	addi a7, zero, 3       # a7=3, read 8bit unsigned
+	ecall
+	slli t0, a0, 8         # store high 8 bits to t0
 
-    addi a7, zero, 0       # a7=0
+
+	addi a7, zero, 0       # a7=0
 input4_low_1:
-    ecall                  
-    beq s10, a0, input4_low_1   # if not zero, hold
+	ecall                  
+	bne zero, a0, input4_low_1   # if not zero, hold
 input4_low_2:
-    ecall                   
-    beq zero, a0, input4_low_2  # if zero, hold
-    addi a7, zero, 3       # a7=3, read 8bit unsigned
-    ecall
-    or t0, t0, a0         # store low 8 bits to t0, the original input is stored in lower 16 bits in t0
+	ecall                   
+	beq zero, a0, input4_low_2  # if zero, hold
+	addi a7, zero, 3       # a7=3, read 8bit unsigned
+	ecall
+	or t0, t0, a0         # store low 8 bits to t0,   the orginal input is stored in lower 16 bits in t0
 
-	lui t1, 32768
+	lui t1, 8
 	and t1, t0, t1   # t1 store the sign bit(0x8000 = 32768)
-    srli t1, t1, 15       # move to the lowest
-    
-    
-	lui t2, 31744
-	srli t2, t2, 15
-	and t2, t0, t2
+        srli t1, t1, 15       # move to the lowest
 	
-    srli t2, t2, 10        # t2 store the expo part (lower bits)
-    addi t2, t2, -15       # sub bias
-    andi t3, t0, 1023    # t3 store the frac part (0x03FF = 1023)
-    ori t3, t3, 1024     # add 1 in the beginning (0x0400 = 1024)
+	addi t2,zero,0x7c
+	slli t2,t2,8
+	and t2, t0, t2
+	   
+	srli t2, t2, 10        # t2 store the expo part  (lower bits)
+	addi t2, t2, -7       # sub bias
+	andi t3, t0, 0x3ff   # t3 store the frac part  (lower bits)
+	addi t3, t3, 0x400     #   add 1 in the begining
 
-    blt t2, zero, is_zero4  # if t2 < 0
-    beq t2, zero, is_zero4  # if t2 == 0
 
-    sll t4, t3, t2         # t4 store the integer part
-    beq zero, zero check_fraction4
+        #bge zero,t2, is_zero2  
+	blt t2, zero, is_zero2   # if t2 < 0
+	#beq t2, zero, is_zero2     #  if t2 == 0
+
+	#sll t4, t3, t2 
+	
+	 
+	       
+	sll t4, t3, t2  # t4 store the integer part
+	beq zero, zero check_fraction4
 
 is_zero4:
-    addi t4, zero, 0       # t4 = 0
-    beq zero, zero check_sign4
+        xori t2, t2, -1  
+        addi t2,t2,1
+        srl t4,t3,t2     
 
 check_fraction4:
-    andi t5, t0, 1023    # t5 store frac part (0x03FF = 1023)
-    slli t6, t5, 1         # Shift left to get the rounding bit
-    
-    lui a3, 1
-    slli a3, a3, 11 
-    and t6, t6, a3      # Isolate the rounding bit (0x0800 = 2048)
-
-    beq t6, zero, check_sign4  # if rounding bit is 0, skip rounding
-    bne t1, zero, round_down4  # if negative, round down
-    addi t4, t4, 1            # if positive, round up
-    beq zero, zero check_sign4
-
-round_down4:
-    addi t4, t4, -1            # if negative, round down
+        srli t4,t4,9
+        andi t5,t4,1
+        srli t4,t4,1
+	#addi t5, t0, 0x3ff    # t5 store the number in last position
+	beq t5, zero, check_sign4   # if   t5 == 0,  not round
+	addi t4, t4, 0x1         #  else , round, i.e t4++
 
 check_sign4:
-    beq t1, zero, positive4    # if t1 (sign bit) == 0, then positive
-
-    # Handle negative numbers without using neg
-    xori t4, t4, -1           # else neg t4 
-    addi t4, t4, 1            #
+	beq t1, zero, positive4 # if t1 (sign bit) == 0, then positive
+	xori t4, t4, -1             # else   neg t4
+	addi t4, t4, 1
 
 positive4:
-   addi a7,zero,0
+	addi a7,zero,0
 output41_1:
 ecall
-beq s10,a0,output41_1 #set confirm to 0 to display output
+bne zero,a0,output41_1 #set confirm to 0 to display output
 output41_2:
 addi a7,zero,4
-addi a0,t4,0 
+addi a0,t4,0
 ecall #write reg a0 to led
 addi a7,zero,0
 ecall
 beq a0,zero,output41_2 #set confirm to 1 to continue
+
 
 beq zero,zero,readtestcase
 
