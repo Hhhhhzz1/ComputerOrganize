@@ -2,13 +2,11 @@
 
 module CPU(
     clk, rst, ConfirmCtrl, test_index, led_data,start_pg, rx, tx,an,light_data,io_rdata
-    ,light_data2,k
+    ,light_data2
     );
     input clk, rst;
     input ConfirmCtrl;
     input [7:0] io_rdata;
-    output k;
-    assign k=ConfirmCtrl;
     input [2:0] test_index;
     output [15:0] led_data;
     output [7:0]an;
@@ -22,6 +20,7 @@ module CPU(
     wire [31:0] jalr_addr, read_data1, read_data2, r_wdata; // ????
     wire [31:0] PC;
     wire [31:0] instruction;
+    
     wire [31:0] link_addr;
     wire jal, jr, b_beq, b_bne; 
     wire [31:0] immNum;
@@ -38,7 +37,7 @@ module CPU(
     
     wire cpu_clk,upg_clk;
     CPUclk cpuClk(.clk_in1(clk),.clk_out1(cpu_clk),.clk_out2(upg_clk));
-    
+    BUFG u1();
 
         wire upg_clk_o; 
         wire upg_wen_o; 
@@ -51,13 +50,13 @@ module CPU(
          
         reg upg_rst; 
         always @ (posedge clk) begin 
-            if (start_pg) upg_rst = 0; 
-            if (rst) upg_rst = 1; 
+            if (start_pg) upg_rst <= 0; 
+            if (rst) upg_rst <= 1; 
         end 
    //rst_2 when urt change than reset anything
         wire rst_2;
         assign rst_2 = (rst) | !upg_rst;
-        uart Uart(.upg_clk_i(upg_clk), .upg_rst_i(upg_rst), .upg_rx_i(rx), .upg_tx_o(tx),
+            uart Uart(.upg_clk_i(upg_clk), .upg_rst_i(upg_rst), .upg_rx_i(rx), .upg_tx_o(tx),
         .upg_clk_o(upg_clk_o), .upg_wen_o(upg_wen_o), .upg_adr_o(upg_adr_o), .upg_dat_o(upg_dat_o), .upg_done_o(upg_done_o));
     
     programrom program(.rom_clk_i(cpu_clk),.rom_adr_i(PC[15:2]),.Instruction_o(instruction),
@@ -87,7 +86,10 @@ module CPU(
 ////        assign index=test_index;
         debounce sw8(clk,test_index[0],rst_2, index[0]);
         debounce sw10(clk,test_index[1],rst_2, index[1]);     
-        debounce sw11(clk,test_index[2],rst_2, index[2]); 
+        debounce sw11(clk,test_index[2],rst_2, index[2]);
+        
+        wire DeConfirmCtrl;
+        debounce sw12(DeClk,ConfirmCtrl,rst_2, DeConfirmCtrl); 
     
     IFetch ifetch (.clk(cpu_clk), .rst(rst_2), .instruction(instruction),
                    .imm(immNum),  
@@ -96,7 +98,7 @@ module CPU(
 wire [31:0]a7;wire signextend;  
     decoder decoder (.instruction(instruction), .immNum(immNum), .reset(rst_2),.r_wdata(r_wdata),
                      .numRe1(read_data1), .numRe2(read_data2), .clk(cpu_clk),.ALUResult(ALU_result)
-                     ,.regWrite(RegWrite),.MemtoReg(MemorIOtoReg),.signextend(signextend),.a7(a7),
+                     ,.regWrite(RegWrite),.MemtoReg(MemorIOtoReg),.a7(a7),
                      .next_pc(link_addr),.jal(jal));
                      
     ALU alu (.ReadData1(read_data1), .ReadData2(read_data2),.imm32(immNum),
@@ -117,13 +119,13 @@ wire [31:0]a7;wire signextend;
                     .rega7(a7),
                     .IORead(IORead), .IOWrite(IOWrite),
                     .ALUSrc(ALUSrc), .ALUOp(ALUOp), .Sftmd(Sftmd), .I_format(I_format));
-   
+   wire [31:0]data1;
     MemOrIO MemOrIO (.mRead(MemRead), .mWrite(MemWrite), .ioRead(IORead), .ioWrite(IOWrite),
                      .addr_in(ALU_result), .addr_out(addr_out), .m_rdata(m_rdata), .io_rdata(io_rdata_de), 
-                     .r_wdata(r_wdata), .r_rdata(read_data2), .write_data(write_data), .rega7(a7),.signextend(signextend),
-                     .LEDCtrl(LEDCtrl),  .ConfirmCtrl(ConfirmCtrl), .test_index(index));
+                     .r_wdata(r_wdata), .r_rdata(read_data2), .write_data(write_data), .rega7(a7),
+                     .LEDCtrl(LEDCtrl),  .ConfirmCtrl(DeConfirmCtrl), .test_index(index),.data1(data1));
     wire [3:0]an2;wire [3:0]an1;
-    light lights(.clk(clk),.LEDCtrl(LEDCtrl),.write_data(index),.light_data(light_data),.an(an1),.rst(rst_2));
+    light lights(.clk(clk),.LEDCtrl(1'b1),.write_data(data1[15:0]),.light_data(light_data),.an(an1),.rst(rst_2));
     light lights2(.clk(clk),.LEDCtrl(LEDCtrl),.write_data(write_data[15:0]),.light_data(light_data2),.an(an2),.rst(rst_2));
     assign an={an1,an2};
     
