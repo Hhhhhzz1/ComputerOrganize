@@ -38,7 +38,7 @@ in,imm,signextend
                7'b0010011: imm=$signed(in[31:20]);//I_caculate
                7'b0110111: imm=$signed(in[31:12]);//U_lui  
                7'b0010111: imm=$signed(in[31:12]);//U_auipc
-               7'b0000011: imm=(signextend==1'b1)?$signed(in[31:20]):in[31:20];//I_load 
+               7'b0000011: imm=$signed(in[31:20]);//I_load 
                default: imm=0;
             endcase
          end    
