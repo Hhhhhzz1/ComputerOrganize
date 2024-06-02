@@ -59,7 +59,7 @@ IORead, IOWrite,
     assign I_format=(opcode==7'b0010011||opcode==7'b0000011)?1:0;
     assign Sftmd=(((opcode==7'b0010011)||(opcode==7'b0110011))&&((Instruction[14:12]==3'h3)||(Instruction[14:12]==3'h2)||(Instruction[14:12]==3'h5)||(Instruction[14:12]==3'h1)))?1:0;
     assign Branch=(opcode==7'b1100011)?1:0;// beq bnq blt bge
-    assign ALUOp=(opcode==7'b0110111)?2'b11:{(opcode==7'b0110011||I_format),Branch};  //to add jal and jr
+    assign ALUOp=(opcode==7'b0110111)?2'b11:{(opcode==7'b0110011||opcode==7'b0010011),Branch};  //to add jal and jr
     assign RegDST=(opcode==7'b0110011||I_format)?1'b1:1'b0;//R type I type
     assign ALUSrc=(opcode==7'b0110011||Branch)?0:1; // R=0 ELSE =1
     
