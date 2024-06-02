@@ -23,8 +23,8 @@ module IFetch(
 
     reg [31:0] dest_PC;
    
-    always @(negedge clk or negedge rst) begin
-        if(rst==1'b0)
+    always @(negedge clk or posedge rst) begin
+        if(rst==1'b1)
         PC=0;
         else if (jr) 
             PC = rs; 
