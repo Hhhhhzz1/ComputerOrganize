@@ -26,9 +26,9 @@ module debounceClkDiv(
 );
 	reg [18:0] q;
 
-	always @(posedge clk or negedge clr)
+	always @(posedge clk or posedge clr)
 		begin
-			if(clr==1'b0)
+			if(clr==1'b1)
 				q <= 0;
 			else
 				q <= q+1;
