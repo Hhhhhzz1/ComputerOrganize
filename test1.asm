@@ -11,11 +11,12 @@
 
 
 readtestcase:
+addi s10,zero,1
 ##read testcase##
 addi a7,zero,0
 readtest_1:
 ecall
-bne zero,a0,readtest_1
+beq s10,a0,readtest_1
 readtest_2:
 ecall
 beq zero,a0,readtest_2
@@ -49,7 +50,7 @@ case0:
 addi a7,zero,0
 input01_1:
 ecall
-bne zero,a0,input01_1
+beq s10,a0,input01_1
 input01_2:
 ecall
 beq zero,a0,input01_2
@@ -59,7 +60,7 @@ addi a1,a0,0
 addi a7,zero,0
 output01_1:
 ecall
-bne zero,a0,output01_1 #set confirm to 0 to display output
+beq s10,a0,output01_1 #set confirm to 0 to display output
 output01_2:
 addi a7,zero,4
 addi a0,a1,0
@@ -77,7 +78,7 @@ beq a0,zero,output01_2  #set confirm to 1 to continue
 addi a7,zero,0
 input02_1:
 ecall
-bne zero,a0,input02_1
+beq s10,a0,input02_1
 input02_2:
 ecall
 beq zero,a0,input02_2
@@ -87,7 +88,7 @@ addi a2,a0,0
 addi a7,zero,0
 output02_1:
 ecall
-bne zero,a0,output02_1 #set confirm to 0 to display output
+beq s10,a0,output02_1 #set confirm to 0 to display output
 output02_2:
 addi a7,zero,4
 addi a0,a2,0
@@ -105,7 +106,7 @@ case1:
 addi a7,zero,0
 input11_1:
 ecall
-bne zero,a0,input11_1
+beq s10,a0,input11_1
 input11_2:
 ecall
 beq zero,a0,input11_2
@@ -116,7 +117,7 @@ sw a0,0(zero) #write input to mem[0]
 addi a7,zero,0
 output11_1:
 ecall
-bne zero,a0,output11_1 #set confirm to 0 to display output
+beq s10,a0,output11_1 #set confirm to 0 to display output
 output11_2:
 addi a7,zero,4
 addi a0,a1,0
@@ -135,7 +136,7 @@ case2:
 addi a7,zero,0
 input21_1:
 ecall
-bne zero,a0,input21_1
+beq s10,a0,input21_1
 input21_2:
 ecall
 beq zero,a0,input21_2
@@ -146,7 +147,7 @@ sw a0,4(zero) #write input to mem[1]
 addi a7,zero,0
 output21_1:
 ecall
-bne zero,a0,output21_1 #set confirm to 0 to display output
+beq s10,a0,output21_1 #set confirm to 0 to display output
 output21_2:
 addi a7,zero,4
 addi a0,a1,0
@@ -166,7 +167,7 @@ beq a1,a2,light3
 addi a7,zero,0
 output32_1:
 ecall
-bne zero,a0,output32_1 #set confirm to 0 to display output
+beq s10,a0,output32_1 #set confirm to 0 to display output
 output32_2:
 addi a7,zero,4
 addi a0,zero,0 
@@ -180,7 +181,7 @@ light3:
 addi a7,zero,0
 output31_1:
 ecall
-bne zero,a0,output31_1 #set confirm to 0 to display output
+beq s10,a0,output31_1 #set confirm to 0 to display output
 output31_2:
 addi a7,zero,4
 addi a0,zero,1 
@@ -199,7 +200,7 @@ blt a1,a2,light4
 addi a7,zero,0
 output42_1:
 ecall
-bne zero,a0,output42_1 #set confirm to 0 to display output
+beq s10,a0,output42_1 #set confirm to 0 to display output
 output42_2:
 addi a7,zero,4
 addi a0,zero,0 
@@ -213,7 +214,7 @@ light4:
 addi a7,zero,0
 output41_1:
 ecall
-bne zero,a0,output41_1 #set confirm to 0 to display output
+beq s10,a0,output41_1 #set confirm to 0 to display output
 output41_2:
 addi a7,zero,4
 addi a0,zero,1 
@@ -232,7 +233,7 @@ bge a1,a2,light5
 addi a7,zero,0
 output52_1:
 ecall
-bne zero,a0,output52_1 #set confirm to 0 to display output
+beq s10,a0,output52_1 #set confirm to 0 to display output
 output52_2:
 addi a7,zero,4
 addi a0,zero,0 
@@ -246,7 +247,7 @@ light5:
 addi a7,zero,0
 output51_1:
 ecall
-bne zero,a0,output51_1 #set confirm to 0 to display output
+beq s10,a0,output51_1 #set confirm to 0 to display output
 output51_2:
 addi a7,zero,4
 addi a0,zero,1 
@@ -265,7 +266,7 @@ bltu a1,a2,light6
 addi a7,zero,0
 output62_1:
 ecall
-bne zero,a0,output62_1 #set confirm to 0 to display output
+beq s10,a0,output62_1 #set confirm to 0 to display output
 output62_2:
 addi a7,zero,4
 addi a0,zero,0 
@@ -279,7 +280,7 @@ light6:
 addi a7,zero,0
 output61_1:
 ecall
-bne zero,a0,output61_1 #set confirm to 0 to display output
+beq s10,a0,output61_1 #set confirm to 0 to display output
 output61_2:
 addi a7,zero,4
 addi a0,zero,1 
@@ -300,7 +301,7 @@ bgeu a1,a2,light
 addi a7,zero,0
 output72_1:
 ecall
-bne zero,a0,output72_1 #set confirm to 0 to display output
+beq s10,a0,output72_1 #set confirm to 0 to display output
 output72_2:
 addi a7,zero,4
 addi a0,zero,0 
@@ -314,7 +315,7 @@ light:
 addi a7,zero,0
 output71_1:
 ecall
-bne zero,a0,output71_1 #set confirm to 0 to display output
+beq s10,a0,output71_1 #set confirm to 0 to display output
 output71_2:
 addi a7,zero,4
 addi a0,zero,1 
