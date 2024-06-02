@@ -42,22 +42,21 @@ ReadData1, ReadData2,imm32,zero,ALUResult,ALUOp,ALUSrc,funct3,funct7
        3'b110,3'b111:ALUResult=(ReadData1-realData);
        default:
        begin 
-       
-       ALUResult=($signed(ReadData1)-$signed(realData)); 
+       ALUResult=$signed($signed(ReadData1)-$signed(realData)); 
        end
        endcase
        end
        2'b10:
        begin
            case(funct3)
-           3'b000,3'b010:ALUResult=(realData+ReadData1);//add or addi
+           3'b000 ,3'b010:ALUResult=(realData+ReadData1);//addi
            3'b100:ALUResult=(ReadData1^realData);//xor
            3'b110:ALUResult=(ReadData1|realData);//or
            3'b111:ALUResult=(ReadData1&realData);//and
            3'b001:ALUResult=(ReadData1<<realData);//sll or slli
            3'b101:begin
            case(funct7)
-           7'd0:ALUResult=(ReadData1>>realData);
+           7'b0:ALUResult=(ReadData1>>realData);
            7'd4:ALUResult=($signed(ReadData1)>>realData);        
            endcase
            end//srl or srli
@@ -69,8 +68,10 @@ ReadData1, ReadData2,imm32,zero,ALUResult,ALUOp,ALUSrc,funct3,funct7
     always @(*) begin
     if(ALUOp==2'b01) begin
     case(funct3)
-    3'b100,3'b110:zero =($signed(ALUResult)<0)?1:0;
-    3'b101,3'b111:zero =($signed(ALUResult)>=0)?1:0;
+    3'b100:zero =($signed(ALUResult)<0)?1:0;
+    3'b110:zero =(ALUResult<0)?1:0;
+    3'b101:zero =($signed(ALUResult)>=0)?1:0;
+    3'b111:zero =(ALUResult>=0)?1:0;
     3'b001:zero =($signed(ALUResult)!=0)?1:0;
     3'b000: zero =($signed(ALUResult)==0)?1:0;
     default:zero=0;
