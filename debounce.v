@@ -10,7 +10,7 @@ module debounce(
     reg state1 = 0, state2 = 0,state3 = 0;
     
     always@(posedge clk) begin
-     if(rst == 1'b0)
+     if(rst == 1'b1)
                 begin
                     state1<=in_signal;
                     state2<=in_signal;
