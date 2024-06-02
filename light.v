@@ -29,8 +29,8 @@ rst,LEDCtrl,write_data,light_data,an,clk
     output reg[3:0]an;
     output reg[6:0] light_data;
     reg [15:0]data;
-    always@(negedge clk or negedge rst) begin
-     if(rst==1'b0)data=0;
+    always@(negedge clk or posedge rst) begin
+     if(rst==1'b1)data=0;
     else 
     if(LEDCtrl==1)data=write_data;
 //    else data=16'h0000;
@@ -38,14 +38,16 @@ rst,LEDCtrl,write_data,light_data,an,clk
     
     reg[18:0] clkdiv;
     reg[3:0] display;// diaplay state
-    always @(posedge clk ) begin
+    always @(posedge clk or posedge rst) begin
+        if(rst==1'b1) clkdiv=0;
+        else
         clkdiv<=clkdiv+1;
     end
     
     wire [1:0] sign;
     assign sign=clkdiv[18:17];
     always @(*) begin
-    if(rst==1'b0)
+    if(rst==1'b1)
       an=4'b1000;
     else begin
          case (sign)
