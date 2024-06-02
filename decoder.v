@@ -18,10 +18,10 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-
+ 
 
 module decoder(
-instruction,immNum,numRe1,numRe2,clk,r_wdata,ALUResult,MemtoReg,regWrite,reset,a7,signextend,jal,next_pc
+instruction,immNum,numRe1,numRe2,clk,r_wdata,ALUResult,MemtoReg,regWrite,reset,a7,jal,next_pc
     );
     reg[31:0] register[0:31];
     input regWrite,reset;
@@ -30,13 +30,13 @@ instruction,immNum,numRe1,numRe2,clk,r_wdata,ALUResult,MemtoReg,regWrite,reset,a
     wire [4:0]rd;
     input[31:0]instruction;
     input jal;
-    input clk,MemtoReg,signextend;
+    input clk,MemtoReg;
     input[31:0] r_wdata,ALUResult;
     output [31:0]immNum,numRe1;
     output [31:0]  numRe2,a7;
 
     
-    imm32 imm(.in(instruction),.imm(immNum),.signextend(signextend));
+    imm32 imm(.in(instruction),.imm(immNum));
     assign a7=register[17];
     always@(*)begin
     if(MemtoReg == 1'b1)
@@ -57,8 +57,8 @@ instruction,immNum,numRe1,numRe2,clk,r_wdata,ALUResult,MemtoReg,regWrite,reset,a
     instruction[11:7];
     
     integer j;
-    always@(posedge clk or negedge reset)begin
-    if(reset==1'b0) begin
+    always@(posedge clk or posedge reset)begin
+    if(reset==1'b1) begin
     for(j=0;j<=31;j=j+1) begin
         register[j] <= 0;
     end
